@@ -36,7 +36,7 @@ namespace Api.Modules.Reservations
         [HttpPost("{id}/checkin")]
         public async Task<IActionResult> PostCheckin(string id, [FromBody] CheckIntoReservationRequest request)
         {
-            Log.Debug($"PATCH reservation {id}");
+            Log.Debug($"POST reservation checkin for {id}");
             try
             {
                 var reservation = await _reservationsFactory.Load(request.ReservationId);

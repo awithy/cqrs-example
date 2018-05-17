@@ -9,8 +9,8 @@ namespace Api.Modules.EventStore
     public interface IEventStore
     {
         Task AddEvent<T>(string id, T @event) where T : EventStoreEvent;
-        Task<IEnumerable<EventStoreEvent>> GetEvents(string id);
-        Task<IEnumerable<EventStoreEvent>> GetEvents(string id, int fromSequence);
+        Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId);
+        Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId, int fromSequence);
         Task AddEvents(string id, IEnumerable<EventStoreEvent> events);
     }
 
@@ -39,18 +39,18 @@ namespace Api.Modules.EventStore
             _events[@event.StreamId].Add(@event);
         }
 
-        public Task<IEnumerable<EventStoreEvent>> GetEvents(string id)
+        public Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId)
         {
-            return !_events.ContainsKey(id) 
+            return !_events.ContainsKey(streamId) 
                 ? Task.FromResult<IEnumerable<EventStoreEvent>>(new EventStoreEvent[0]) 
-                : Task.FromResult<IEnumerable<EventStoreEvent>>(_events[id]);
+                : Task.FromResult<IEnumerable<EventStoreEvent>>(_events[streamId]);
         }
 
-        public Task<IEnumerable<EventStoreEvent>> GetEvents(string id, int fromSequence)
+        public Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId, int fromSequence)
         {
-            return !_events.ContainsKey(id) 
+            return !_events.ContainsKey(streamId) 
                 ? Task.FromResult<IEnumerable<EventStoreEvent>>(new EventStoreEvent[0]) 
-                : Task.FromResult(_events[id].Where(x => x.Sequence >= fromSequence));
+                : Task.FromResult(_events[streamId].Where(x => x.Sequence >= fromSequence));
         }
 
         public Task AddEvents(string id, IEnumerable<EventStoreEvent> events)

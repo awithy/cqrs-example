@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +8,13 @@ namespace Api.Modules.EventStore
 {
     public interface IEventStore
     {
-        
+        Task AddEvent<T>(string id, T @event) where T : EventStoreEvent;
+        Task<IEnumerable<EventStoreEvent>> GetEvents(string id);
+        Task<IEnumerable<EventStoreEvent>> GetEvents(string id, int fromSequence);
+        Task AddEvents(string id, IEnumerable<EventStoreEvent> events);
     }
 
-    public class EventStore
+    public class EventStore : IEventStore
     {
         private readonly ConcurrentDictionary<string, List<EventStoreEvent>> _events = new ConcurrentDictionary<string, List<EventStoreEvent>>();
         private readonly ConcurrentDictionary<string, int> _sequences = new ConcurrentDictionary<string, int>();
@@ -33,7 +35,8 @@ namespace Api.Modules.EventStore
             var sequence = _sequences[id] + 1;
             _sequences[id] = sequence;
             @event.Sequence = sequence;
-            _events[@event.Id].Add(@event);
+            @event.EventId = Guid.NewGuid().ToString("n");
+            _events[@event.StreamId].Add(@event);
         }
 
         public Task<IEnumerable<EventStoreEvent>> GetEvents(string id)
@@ -76,7 +79,8 @@ namespace Api.Modules.EventStore
 
     public class EventStoreEvent
     {
-        public string Id { get; set; }
+        public string StreamId { get; set; }
+        public string EventId { get; internal set; }
         public int Sequence { get; internal set; }
     }
 }

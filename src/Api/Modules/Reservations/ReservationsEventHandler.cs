@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Api.Events;
 
 namespace Api.Modules.Reservations
 {

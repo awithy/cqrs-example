@@ -5,17 +5,18 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Api
 {
-    class Program
+    public class Program
     {
+        public static IWebHost Host;
         private static ILogger Log;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Logger.Initialize(verbose : true);
             Log = new Logger(typeof(Program));
             Log.Info("CQRS Example Starting...");
 
-            var host = new WebHostBuilder()
+            Host = new WebHostBuilder()
                 .CaptureStartupErrors(true)
                 .UseSetting("detailedErrors", "true")
                 .UseKestrel()
@@ -23,7 +24,7 @@ namespace Api
                 .Build();
 
             Log.Info("Starting host");
-            host.Run();
+            Host.Run();
 
             Log.Info("CQRS Example Exiting...");
         }

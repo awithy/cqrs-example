@@ -5,14 +5,23 @@ using Api.Utility;
 
 namespace Api.Modules.Reservations
 {
-    public class ReservationsEventHandler : IHandle<SessionLocationChanged>
+    public interface IReservationsEventHandler : IHandle<SessionCancelledEvent>
+    {
+    }
+
+    public class ReservationsEventHandler : IReservationsEventHandler
     {
         static Logger Log = new Logger(typeof(ReservationsEventHandler));
+        private ReservationsFactory _reservationsFactory;
 
-        public Task Handle(SessionLocationChanged @event)
+        public ReservationsEventHandler()
         {
-            Log.Debug("Handle SessionLocationChanged");
-            return Task.CompletedTask;
+            _reservationsFactory = new ReservationsFactory(EventHandlerContext.Current.EventStore); //this is hacky.  I want to change to use the container.
+        }
+
+        public async Task Handle(SessionCancelledEvent @event)
+        {
+            Log.Debug("Handle SessionCancelledEvent");
         }
     }
 }

@@ -4,13 +4,14 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Api.Common;
+using Api.Modules.EventStore;
 using Api.Utility;
 
 namespace Api.Modules.EventBus
 {
     public interface IEventBus
     {
-        Task Initialize();
+        Task Initialize(IEventStore eventStore);
         Task Publish(EventMessage @event);
     }
 
@@ -19,7 +20,7 @@ namespace Api.Modules.EventBus
         private static readonly Logger Log = new Logger(typeof(EventBus));
         private static readonly Dictionary<string, IEnumerable<EventHandler>> EventHandlers = new Dictionary<string, IEnumerable<EventHandler>>();
 
-        public Task Initialize()
+        public Task Initialize(IEventStore eventStore)
         {
             Log.Debug("Initializing...");
 

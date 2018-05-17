@@ -48,6 +48,18 @@ namespace Tests
             eventStream.Skip(1).First().Sequence.Should().Be(3, "should return the event with sequence == 3");
         }
 
+        [Fact]
+        public async Task StreamExists()
+        {
+            var eventStore = new EventStore();
+            var exists = await eventStore.StreamExists("1");
+            exists.Should().BeFalse("stream should not exist before an event is added");
+            var testEvent1 = new TestEvent { StreamId = "1", Data = "Initial" };
+            await eventStore.AddEvent("1", testEvent1);
+            exists = await eventStore.StreamExists("1");
+            exists.Should().BeTrue("stream should exist after an event is added");
+        }
+
         public class TestEvent : EventStoreEvent
         {
             public string Data { get; set; }

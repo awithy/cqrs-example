@@ -8,10 +8,11 @@ namespace Api.Modules.EventStore
 {
     public interface IEventStore
     {
-        Task AddEvent<T>(string id, T @event) where T : EventStoreEvent;
+        Task AddEvent<T>(string streamId, T @event) where T : EventStoreEvent;
         Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId);
         Task<IEnumerable<EventStoreEvent>> GetEvents(string streamId, int fromSequence);
-        Task AddEvents(string id, IEnumerable<EventStoreEvent> events);
+        Task AddEvents(string streamId, IEnumerable<EventStoreEvent> events);
+        Task<bool> StreamExists(string streamId);
     }
 
     public class EventStore : IEventStore
@@ -20,12 +21,12 @@ namespace Api.Modules.EventStore
         private readonly ConcurrentDictionary<string, int> _sequences = new ConcurrentDictionary<string, int>();
         private static readonly ConcurrentDictionary<string, object> LockObjects = new ConcurrentDictionary<string, object>();
 
-        public Task AddEvent<T>(string id, T @event) where T : EventStoreEvent
+        public Task AddEvent<T>(string streamId, T @event) where T : EventStoreEvent
         {
-            _InitializeStream(id);
+            _InitializeStream(streamId);
 
-            lock (LockObjects[id])
-                _AddEvent(id, @event);
+            lock (LockObjects[streamId])
+                _AddEvent(streamId, @event);
 
             return Task.CompletedTask;
         }
@@ -36,6 +37,7 @@ namespace Api.Modules.EventStore
             _sequences[id] = sequence;
             @event.Sequence = sequence;
             @event.EventId = Guid.NewGuid().ToString("n");
+            @event.Timestamp = DateTime.UtcNow;
             _events[@event.StreamId].Add(@event);
         }
 
@@ -53,13 +55,18 @@ namespace Api.Modules.EventStore
                 : Task.FromResult(_events[streamId].Where(x => x.Sequence >= fromSequence));
         }
 
-        public Task AddEvents(string id, IEnumerable<EventStoreEvent> events)
+        public Task<bool> StreamExists(string streamId)
         {
-            _InitializeStream(id);
+            return Task.FromResult(_events.ContainsKey(streamId));
+        }
 
-            lock (LockObjects[id])
+        public Task AddEvents(string streamId, IEnumerable<EventStoreEvent> events)
+        {
+            _InitializeStream(streamId);
+
+            lock (LockObjects[streamId])
                 foreach (var @event in events)
-                    _AddEvent(id, @event);
+                    _AddEvent(streamId, @event);
 
             return Task.CompletedTask;
         }
@@ -82,5 +89,6 @@ namespace Api.Modules.EventStore
         public string StreamId { get; set; }
         public string EventId { get; internal set; }
         public int Sequence { get; internal set; }
+        public DateTime Timestamp { get; internal set; }
     }
 }

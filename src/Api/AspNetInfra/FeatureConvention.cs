@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace Api
+namespace Api.AspNetInfra
 {
     public class FeatureConvention : IControllerModelConvention
     {

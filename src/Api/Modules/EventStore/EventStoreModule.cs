@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Api.Common;
 
 namespace Api.Modules.EventStore
 {

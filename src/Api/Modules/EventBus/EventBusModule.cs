@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Api.Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Modules.EventBus

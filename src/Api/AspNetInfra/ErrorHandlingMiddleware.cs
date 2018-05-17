@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Api.Utility;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace Api
+namespace Api.AspNetInfra
 {
     internal class ErrorHandlingMiddleware
     {

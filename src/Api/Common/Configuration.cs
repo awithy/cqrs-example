@@ -1,4 +1,4 @@
-﻿namespace Api
+﻿namespace Api.Common
 {
     public interface IApiConfig
     {

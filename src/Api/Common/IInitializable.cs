@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Api
+namespace Api.Common
 {
     internal interface IInitializable
     {
